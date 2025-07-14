@@ -1,0 +1,169 @@
+openapi: 3.0.0
+info:
+  title: Real-Time Messaging API
+  version: 1.0.0
+  description: API documentation for the real-time messaging backend
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: User registered
+        '400':
+          description: Validation error
+  /api/auth/login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+  /api/auth/refresh:
+    post:
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+        '401':
+          description: No refresh token
+        '403':
+          description: Invalid refresh token
+  /api/auth/logout:
+    post:
+      summary: Logout user
+      responses:
+        '200':
+          description: Logged out
+  /api/auth/me:
+    get:
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+        '401':
+          description: Unauthorized
+  /api/user/list:
+    get:
+      summary: List all users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of users
+        '401':
+          description: Unauthorized
+  /api/conversation/create:
+    post:
+      summary: Create a new conversation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                participantIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Conversation created
+        '401':
+          description: Unauthorized
+  /api/conversation/my:
+    get:
+      summary: List conversations for current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of conversations
+        '401':
+          description: Unauthorized
+  /api/message/send:
+    post:
+      summary: Send a message
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversationId:
+                  type: string
+                receiverId:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Message sent
+        '401':
+          description: Unauthorized
+  /api/message/{conversationId}:
+    get:
+      summary: Get messages for a conversation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of messages
+        '401':
+          description: Unauthorized
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
